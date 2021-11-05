@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,\
                                         PermissionsMixin
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -38,9 +39,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Category(models.Model):
-    """Category to be used for a movie"""
+    """Category to be used in a movie"""
     name = models.CharField(max_length=255)
 
+    class Meta:
+        verbose_name_plural = "Categories"
+    
     def __str__(self):
         return self.name
 
@@ -51,3 +55,37 @@ class Actor(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Movie(models.Model):
+    """Movie to be used in our store"""
+    title = models.CharField(max_length=255)
+    year = models.IntegerField(default=2018)
+    summary = models.TextField(max_length=1000, blank=True)
+    categories = models.ManyToManyField('Category')
+    actors = models.ManyToManyField('Actor')
+    Rent_date = models.DateField(default=timezone.now)
+    Return_date = models.DateField(default=timezone.now)
+    user_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+
+    first_three_days_cost = 1
+    extra_days_cost = 0.5
+
+    def find_rent_days(self, *args, **kwargs):
+        """Calculate the days a user used a movie"""
+        return ((self.Return_date - self.Rent_date).days)
+
+    def calculate_charge(self, *args, **kwargs):
+        """Calculate user's charge for a movie he/she rent"""
+        rent_days = self.find_rent_days()
+
+        if rent_days <= 3:
+            self.user_charge = rent_days*self.first_three_days_cost
+        else:
+            self.user_charge = (
+                                (rent_days-3) * self.extra_days_cost + 3 *
+                                self.first_three_days_cost
+                                )
+
+    def __str__(self):
+        return self.title

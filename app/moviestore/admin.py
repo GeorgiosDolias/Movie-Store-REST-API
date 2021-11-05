@@ -34,3 +34,5 @@ admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Category)
 
 admin.site.register(models.Actor)
+
+admin.site.register(models.Movie)
