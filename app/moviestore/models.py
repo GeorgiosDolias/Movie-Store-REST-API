@@ -44,7 +44,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = "Categories"
-    
+
     def __str__(self):
         return self.name
 
@@ -66,7 +66,7 @@ class Movie(models.Model):
     actors = models.ManyToManyField('Actor')
     Rent_date = models.DateField(default=timezone.now)
     Return_date = models.DateField(default=timezone.now)
-    user_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    usr_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2)
 
     first_three_days_cost = 1
     extra_days_cost = 0.5
@@ -80,9 +80,9 @@ class Movie(models.Model):
         rent_days = self.find_rent_days()
 
         if rent_days <= 3:
-            self.user_charge = rent_days*self.first_three_days_cost
+            self.usr_charge = rent_days*self.first_three_days_cost
         else:
-            self.user_charge = (
+            self.usr_charge = (
                                 (rent_days-3) * self.extra_days_cost + 3 *
                                 self.first_three_days_cost
                                 )
